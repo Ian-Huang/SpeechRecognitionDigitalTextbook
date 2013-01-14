@@ -3,15 +3,14 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" 
       x:Class="SpeechRecognitionDigitalTextbook.SettingPage" 
       mc:Ignorable="d" 
       d:DesignHeight="720" d:DesignWidth="1280"
 	  Title="Setting" Loaded="Page_Loaded" Unloaded="Page_Unloaded" SizeChanged="Page_SizeChanged" Background="#FFE2E2E2">
 	<Page.Resources>
         <DataTemplate x:Key="ClassListDataTemplate">
-			<StackPanel HorizontalAlignment="Stretch" Height="50" Margin="0" VerticalAlignment="Stretch" Width="200">
-				<TextBlock x:Name="textBlock" Margin="0,0,8,0" TextWrapping="Wrap" Text="{Binding ClassListName}" d:LayoutOverrides="Width" FontSize="48"/>
-			</StackPanel>
+			<TextBlock x:Name="textBlock" Margin="0" TextWrapping="Wrap" FontSize="37.333" Text="{Binding ClassName}" HorizontalAlignment="Center" VerticalAlignment="Center" LineHeight="8" TextAlignment="Center" AllowDrop="False"/>
 		</DataTemplate>
 		
 	</Page.Resources>
@@ -21,8 +20,17 @@
         <Rectangle Canvas.Left="0" Canvas.Top="0" x:Name="TopRectangle" Width="1280" Fill="#AB00C4E6" Panel.ZIndex="-1" Height="100" StrokeThickness="0" />
         <Image Canvas.Left="0" Canvas.Top="-1" Height="100" x:Name="BackImage" Stretch="Fill" Width="100" Source="Images/BackImage.png" MouseUp="BackImage_MouseUp" />
         <TextBlock Canvas.Top="100" x:Name="ListText" FontSize="64" FontFamily="DFYanKaiW5-B5" Canvas.Left="0" ><Run Language="zh-tw" Text="清單"/></TextBlock>
-        <ListBox x:Name="ClassList" Height="472" Style="{DynamicResource SimpleListBox}" Canvas.Top="165" Width="200" Canvas.Left="1" ItemTemplate="{StaticResource ClassListDataTemplate}" />
+        <ListBox x:Name="ClassList" Height="472" Style="{DynamicResource SimpleListBox}" Canvas.Top="165" Width="200" Canvas.Left="1" ItemTemplate="{StaticResource ClassListDataTemplate}" SelectionChanged="ClassList_SelectionChanged" />
         <Button FontFamily="DFYanKaiW5-B5" FontSize="46" Canvas.Left="2" Canvas.Top="642" Content="新增" x:Name="CreateButton" Height="80" Click="CreateButton_Click" />
-        <Image Canvas.Left="104" Canvas.Top="642" Height="80" x:Name="DeleteImage" Stretch="Fill" Width="97" Source="/SpeechRecognitionDigitalTextbook;component/Images/trash.png" />
+        <Image Canvas.Left="104" Canvas.Top="642" Height="80" x:Name="DeleteImage" Stretch="Fill" Width="97" Source="/SpeechRecognitionDigitalTextbook;component/Images/trash.png" MouseUp="DeleteImage_MouseUp" />
+        <Canvas x:Name="GetBackgroundCanvas" Height="200" Canvas.Left="244" Canvas.Top="165" Width="1000" Background="White" AllowDrop="True" Drop="GetBackgroundCanvas_Drop">
+            <TextBlock x:Name="test" TextWrapping="Wrap" Text="背景圖" FontSize="24"/>
+            <Image x:Name="ChooseBackgroundImage" Height="200" Canvas.Left="220" />
+            <Button Content="選取背景圖片" Canvas.Left="90" Canvas.Top="80" Click="ChooseBackgroundPicture_Click" FontSize="18"/>
+        </Canvas>
+        <Canvas Width="1000" Background="White" Height="237" Canvas.Left="244" Canvas.Top="400" />
+        <TextBlock Canvas.Left="244" TextWrapping="Wrap" Text="課程名稱" Canvas.Top="649" FontSize="48" />
+        <TextBox Name="ClassNameTextbox"  Canvas.Left="436" TextWrapping="NoWrap"  Text="" Canvas.Top="646" FontSize="48" Width="507" />
+        <Button Name="SaveClassDataButton" Content="儲存" Canvas.Left="964" Canvas.Top="645" FontSize="48" Click="SaveClassDataButton_Click"/>
     </Canvas>
 </Page>

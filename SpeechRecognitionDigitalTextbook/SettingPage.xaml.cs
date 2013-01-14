@@ -11,29 +11,15 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Win32;
 
 namespace SpeechRecognitionDigitalTextbook
 {
-    
-
     /// <summary>
     /// Setting.xaml 的互動邏輯
     /// </summary>
     public partial class SettingPage : Page
     {
-        public class ClassListData
-        {
-            public string ClassListName { set; get; }
-
-            public ClassListData()
-            {
-            }
-            public ClassListData(string name)
-            {
-                this.ClassListName = name;
-            }
-        }
-
 
         #region Window Event
 
@@ -46,11 +32,14 @@ namespace SpeechRecognitionDigitalTextbook
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             //載入Navigation Page的寬高
-            double width = Application.Current.Windows[0].ActualWidth;
-            double height = Application.Current.Windows[0].ActualHeight;
-            this.Width = width;
-            this.Height = height;
+            this.Width = Application.Current.Windows[0].ActualWidth;
+            this.Height = Application.Current.Windows[0].ActualHeight;
 
+            //全域物件初始化            
+            this.currentClassIndex = -1;
+            this.classNum = 1;
+            this.classList = new List<ClassData>();
+            this.openFileDialog = new OpenFileDialog();
         }
 
         //當畫面Unload，執行此函式
@@ -61,13 +50,16 @@ namespace SpeechRecognitionDigitalTextbook
 
         //當畫面解析度改變，將UI位置改變
         private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
-        { 
+        {
+            // 1280x720是版面標準比例，當版面尺寸改變，去get新的Scale，後續定UI會用到
+            Point newScale = new Point(e.NewSize.Width / 1280, e.NewSize.Height / 720);
+
             //TopRectangle width
             this.TopRectangle.Width = this.Width;
 
             //GameSettingText position
             Canvas.SetLeft(this.GameSettingText, (e.NewSize.Width - this.GameSettingText.ActualWidth) / 2);
-            Canvas.SetTop(this.GameSettingText, (this.TopRectangle.Height - this.GameSettingText.ActualHeight) / 2);        
+            Canvas.SetTop(this.GameSettingText, (this.TopRectangle.Height - this.GameSettingText.ActualHeight) / 2);
 
             //BackImage width & height
             this.BackImage.Width = this.BackImage.Height = this.TopRectangle.ActualHeight;
@@ -80,36 +72,141 @@ namespace SpeechRecognitionDigitalTextbook
             Canvas.SetLeft(this.DeleteImage, this.CreateButton.ActualWidth + 5);
             Canvas.SetTop(this.DeleteImage, e.NewSize.Height - this.DeleteImage.ActualHeight - 10);
 
-            //ListText position & Width Height
-            Canvas.SetLeft(this.ListText, (this.ClassList.Width - this.ListText.ActualWidth) / 2);
-            Canvas.SetTop(this.ListText, this.TopRectangle.Height);
             this.ClassList.Width = 200;
             this.ClassList.Height = Math.Abs(Canvas.GetTop(this.ClassList) - Canvas.GetTop(this.CreateButton)) - 10;
+
+            //ListText position & Width Height            
+            Canvas.SetLeft(this.ListText, (this.ClassList.Width - this.ListText.ActualWidth) / 2);
+            Canvas.SetTop(this.ListText, this.TopRectangle.Height);
+
         }
 
+        //當"BackImage"被觸發，會回到上一頁
         private void BackImage_MouseUp(object sender, MouseButtonEventArgs e)
         {
             NavigationService.Navigate(new Uri("HomeMenu.xaml", UriKind.Relative));
         }
 
-        List<ClassListData> dataList = new List<ClassListData>();
-        int num = 1;
+
+        //當"CreateButton"被觸發，新增新的課程
+        private List<ClassData> classList { get; set; }
+        private int classNum { get; set; }        
         private void CreateButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-        	// TODO: 在此新增事件處理常式執行項目。
-            ClassListData data = new ClassListData("class" + num.ToString());
-            
-            dataList.Add(data);
-            num++;
+            ClassData data = new ClassData("未命名課程" + classNum.ToString());
+
+            this.classList.Add(data);
+            this.classNum++;
             this.ClassList.ItemsSource = null;
-            this.ClassList.ItemsSource = dataList;
+            this.ClassList.ItemsSource = classList;
         }
 
-        #endregion       
+
+        //當"DeleteImage"被觸發，刪除清單上被選取的課程
+        private void DeleteImage_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            //if (this.classList.Count == 1)
+            //{
+            //    MessageBox.Show("不可刪除全部課程");
+            //    return;
+            //}
+            if (ClassList.SelectedIndex != -1)
+            {
+                this.classList.RemoveAt(this.ClassList.SelectedIndex);
+                this.ClassList.ItemsSource = null;
+                this.ClassList.ItemsSource = this.classList;
+            }
+        }
+
+        //處理選取背景圖片拖放到Canvas上的事件
+        private void GetBackgroundCanvas_Drop(object sender, DragEventArgs e)
+        {
+            //  獲得拖放圖片
+            String[] DropFiles = (String[])(e.Data.GetData(DataFormats.FileDrop));
+            if (DropFiles != null)
+            {
+                // 設置圖像
+                try
+                {
+                    BitmapImage DropImage = new BitmapImage(new Uri(DropFiles[0]));
+                    //DropImage.BeginInit();
+                    //DropImage.UriSource = new Uri(DropFiles[0]);
+                    //DropImage.EndInit();
+                    this.ChooseBackgroundImage.Source = DropImage;
+                }
+                catch
+                {
+                    MessageBox.Show("圖片格式錯誤");
+                }
+            }
+        }
+
+        //當"ChooseBackgroundPicture" Button被觸發，選擇課程的背景圖
+        private OpenFileDialog openFileDialog { get; set; }
+        private void ChooseBackgroundPicture_Click(object sender, RoutedEventArgs e)
+        {
+            // Configure open file dialog box
+            this.openFileDialog.FileName = "";                                          // Default file name
+            this.openFileDialog.DefaultExt = ".txt";                                    // Default file extension
+            this.openFileDialog.Filter = "JPEG|*.JPG;*.JPEG;*.JPE; | PNG|*.PNG;*.PNS";  // Filter files by extension
+            this.openFileDialog.Multiselect = true;                                     //是否可以選擇多檔案
+            this.openFileDialog.Title = "選擇背景圖片";
+
+            // Show open file dialog box
+            Nullable<bool> result = this.openFileDialog.ShowDialog();
+
+            // Process open file dialog box results
+            if (result == true)
+            {
+                //將選取的圖片匯入背景image元件
+                BitmapImage DropImage = new BitmapImage(new Uri(this.openFileDialog.FileName));
+                this.ChooseBackgroundImage.Source = DropImage;
+            }
+        }
+
+        //當ClassList的子項目被選取或改變，觸發此函式
+        private int currentClassIndex { get; set; }             //紀錄上次選擇子項目的index
+        private void ClassList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            this.ClassList.ReleaseMouseCapture();           //釋放滑鼠
+            if (ClassList.SelectedIndex != -1)
+            {
+                this.currentClassIndex = this.ClassList.SelectedIndex;
+                
+                //Load Class Data
+                this.ClassNameTextbox.Text = this.classList[this.ClassList.SelectedIndex].ClassName;
+            }
+            else
+            {
+                if (this.currentClassIndex < this.classList.Count)
+                    this.ClassList.SelectedIndex = this.currentClassIndex;
+                else
+                    this.ClassList.SelectedIndex = this.classList.Count - 1;
+            }
+            
+        }
+
+        //當"SaveClassData" Button被觸發，儲存課程資訊
+        private void SaveClassDataButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+        #endregion
 
         
+        public class ClassData
+        {
+            public string ClassName { set; get; }
+
+            public ClassData()
+            {
+            }
+            public ClassData(string name)
+            {
+                this.ClassName = name;
+            }
+        }
 
         
- 
     }
 }
