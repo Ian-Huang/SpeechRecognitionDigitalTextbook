@@ -90,7 +90,9 @@ namespace SpeechRecognitionDigitalTextbook
 
         //當"CreateButton"被觸發，新增新的課程
         private List<ClassData> classList { get; set; }
-        private int classNum { get; set; }        
+        private int classNum { get; set; }
+
+        private List<ObjectData> objectList = new List<ObjectData>();
         private void CreateButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             ClassData data = new ClassData("未命名課程" + classNum.ToString());
@@ -101,6 +103,14 @@ namespace SpeechRecognitionDigitalTextbook
             this.ClassList.ItemsSource = classList;
 
             this.ClassNameTextbox.IsEnabled = true;         //開啟ClassNameTextbox 輸入功能
+
+
+            ObjectData Odata = new ObjectData("123");
+
+            this.objectList.Add(Odata);
+            this.ObjectList.ItemsSource = null;
+            this.ObjectList.ItemsSource = objectList;
+
         }
 
 
@@ -185,7 +195,7 @@ namespace SpeechRecognitionDigitalTextbook
             if (ClassList.SelectedIndex != -1)
             {
                 this.currentClassIndex = this.ClassList.SelectedIndex;
-                
+
                 //Load Class Data
                 this.ClassNameTextbox.Text = this.classList[this.ClassList.SelectedIndex].ClassName;
             }
@@ -196,7 +206,6 @@ namespace SpeechRecognitionDigitalTextbook
                 else
                     this.ClassList.SelectedIndex = this.classList.Count - 1;
             }
-            
         }
 
         //當"SaveClassData" Button被觸發，儲存課程資訊
@@ -215,9 +224,19 @@ namespace SpeechRecognitionDigitalTextbook
             }
         }
 
+        private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+        	// TODO: 在此新增事件處理常式執行項目。
+        }
+
+        private void Image_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+        	// TODO: 在此新增事件處理常式執行項目。
+        }
+
         #endregion
 
-        
+
         public class ClassData
         {
             public string ClassName { set; get; }
@@ -231,6 +250,22 @@ namespace SpeechRecognitionDigitalTextbook
             }
         }
 
-        
+        public class ObjectData
+        {
+            public string Test { set; get; }
+
+            public ObjectData()
+            {
+            }
+            public ObjectData(string name)
+            {
+                this.Test = name;
+            }
+        }
+
+        private void ObjectList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            test.Text = ObjectList.SelectedIndex.ToString();
+        }
     }
 }
