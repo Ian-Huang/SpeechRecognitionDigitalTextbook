@@ -99,6 +99,8 @@ namespace SpeechRecognitionDigitalTextbook
             this.classNum++;
             this.ClassList.ItemsSource = null;
             this.ClassList.ItemsSource = classList;
+
+            this.ClassNameTextbox.IsEnabled = true;         //開啟ClassNameTextbox 輸入功能
         }
 
 
@@ -112,9 +114,20 @@ namespace SpeechRecognitionDigitalTextbook
             //}
             if (ClassList.SelectedIndex != -1)
             {
-                this.classList.RemoveAt(this.ClassList.SelectedIndex);
-                this.ClassList.ItemsSource = null;
-                this.ClassList.ItemsSource = this.classList;
+                MessageBoxResult result = MessageBox.Show("是否刪除 <" + this.classList[ClassList.SelectedIndex].ClassName + "> 課程", "提示", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.Yes)
+                {
+                    this.classList.RemoveAt(this.ClassList.SelectedIndex);
+                    this.ClassList.ItemsSource = null;
+                    this.ClassList.ItemsSource = this.classList;
+                }
+
+                //當刪光全部課程，版面清空
+                if (this.classList.Count == 0)
+                {
+                    this.ClassNameTextbox.Text = "";
+                    this.ClassNameTextbox.IsEnabled = false;
+                }
             }
         }
 
@@ -189,8 +202,19 @@ namespace SpeechRecognitionDigitalTextbook
         //當"SaveClassData" Button被觸發，儲存課程資訊
         private void SaveClassDataButton_Click(object sender, RoutedEventArgs e)
         {
-
+            if (ClassList.SelectedIndex != -1)
+            {
+                MessageBoxResult result = MessageBox.Show("是否儲存 <" + this.classList[ClassList.SelectedIndex].ClassName + "> 課程", "提示", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.Yes)
+                {
+                    //儲存課程資訊
+                    this.classList[this.ClassList.SelectedIndex].ClassName = this.ClassNameTextbox.Text;
+                    this.ClassList.ItemsSource = null;
+                    this.ClassList.ItemsSource = this.classList;
+                }
+            }
         }
+
         #endregion
 
         
