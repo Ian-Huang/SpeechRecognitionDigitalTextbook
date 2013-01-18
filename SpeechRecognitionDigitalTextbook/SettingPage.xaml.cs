@@ -105,7 +105,7 @@ namespace SpeechRecognitionDigitalTextbook
             this.ClassNameTextbox.IsEnabled = true;         //開啟ClassNameTextbox 輸入功能
 
 
-            ObjectData Odata = new ObjectData("123");
+            ObjectData Odata = new ObjectData((this.objectList.Count + 1).ToString());
 
             this.objectList.Add(Odata);
             this.ObjectList.ItemsSource = null;
@@ -224,15 +224,6 @@ namespace SpeechRecognitionDigitalTextbook
             }
         }
 
-        private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-        	// TODO: 在此新增事件處理常式執行項目。
-        }
-
-        private void Image_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-        	// TODO: 在此新增事件處理常式執行項目。
-        }
 
         #endregion
 
@@ -252,20 +243,30 @@ namespace SpeechRecognitionDigitalTextbook
 
         public class ObjectData
         {
-            public string Test { set; get; }
+            public string ObjectNumber { set; get; }
 
             public ObjectData()
             {
             }
             public ObjectData(string name)
             {
-                this.Test = name;
+                this.ObjectNumber = name;
             }
         }
 
         private void ObjectList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             test.Text = ObjectList.SelectedIndex.ToString();
+        }
+
+        private void ObjectDeleteImage_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+        	// TODO: 在此新增事件處理常式執行項目。
+        }
+
+        private void ObjectChooseImage_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+        	// TODO: 在此新增事件處理常式執行項目。
         }
     }
 }

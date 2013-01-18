@@ -189,5 +189,11 @@
   <ItemGroup>
     <Resource Include="Images\trash.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\SRPicture.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ChoosePictureButton.jpg" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
